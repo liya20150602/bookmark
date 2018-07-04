@@ -1,0 +1,6 @@
+{
+  "getLocation":{
+    "method":"get",
+    "url":"apis/v3/location/search.json"
+  }
+}
