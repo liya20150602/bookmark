@@ -2,5 +2,17 @@
   "getLocation":{
     "method":"get",
     "url":"apis/v3/location/search.json"
+  },
+  "getRandomBgImg":{
+    "method":"post",
+    "url":"apis/bookmark/bgImg/getRandomBgImg/"
+  },
+  "getBookmarkCategory":{
+    "method":"get",
+    "url":"apis/bookmark/bookmark/getBookmarkCategory/"
+  },
+  "getBookmarks":{
+    "method":"post",
+    "url":"apis/bookmark/bookmark/getBookmarks/"
   }
 }

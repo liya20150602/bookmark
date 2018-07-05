@@ -5,11 +5,14 @@
 import api from './service.json';
 
 class service extends BaseModule{
-  getLocation(data){
-   return  this.get(api.getLocation,data)
+  getRandomBgImg(data){
+   return  this.post(api.getRandomBgImg,data)
   }
-  getCurrentCity(){
-    return this.get(api.getCurrentCity)
+  getBookmarkCategory(){
+    return this.get(api.getBookmarkCategory)
+  }
+  getBookmarks(data){
+    return this.post(api.getBookmarks, data)
   }
 }
 export default  new service()
