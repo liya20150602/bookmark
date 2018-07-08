@@ -14,5 +14,21 @@
   "getBookmarks":{
     "method":"post",
     "url":"apis/bookmark/bookmark/getBookmarks/"
+  },
+  "login":{
+    "method":"post",
+    "url":"apis/bookmark/login/in/"
+  },
+  "checkLoginName":{
+    "method":"get",
+    "url":"apis/bookmark/account/checkLoginName/"
+  },
+  "checkEmail":{
+    "method":"get",
+    "url":"apis/bookmark/account/checkEmail/"
+  },
+  "register":{
+    "method":"post",
+    "url":"apis/bookmark/account/register/"
   }
 }

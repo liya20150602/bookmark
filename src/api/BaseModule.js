@@ -4,6 +4,7 @@
 import axios from 'axios'
 import qs from 'qs'
 
+
 class BaseModule {
   constructor(){
     this.$http=axios.create({
@@ -28,12 +29,15 @@ class BaseModule {
       if(response.status==200){
           if(response.data.state==1){
               return Promise.resolve(response.data.data)
-            }
+            }else {
+            this.$message('服务器接口错误');
+          }
       }else {
         return Promise.reject()
       }
       return response
     }, error => {
+      // this.$message('400');
       return Promise.reject(error.response)
     })
   }
@@ -41,11 +45,13 @@ class BaseModule {
     return this.$http({
       method: 'post',
       url: url.url,
-      data: qs.stringify(data),
+      // data: qs.stringify(data),
+      data: data,
       timeout: 10000,
       headers: {
         'X-Requested-With': 'XMLHttpRequest',
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+        // 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+        'Content-Type': 'application/json; charset=UTF-8'
       }
     })
   }

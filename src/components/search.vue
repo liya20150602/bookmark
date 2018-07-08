@@ -6,11 +6,11 @@
       <el-option label="必应" value="bing"></el-option>
     </el-select>
     <el-autocomplete
-      v-model="input5"
+      v-model="searchKeyWord"
       :fetch-suggestions="querySearchAsync"
       placeholder="请输入内容"
+      :trigger-on-focus=false
       @select="handleSelect"
-      class="auto-search"
     ></el-autocomplete>
   </div>
 </template>
@@ -46,24 +46,58 @@
         input3: '',
         input4: '',
         input5: '',
-        select: 'baidu'
+        select: 'baidu',
+        searchKeyWord: '',
+        restaurants:[]
       }
     },
     methods:{
       querySearchAsync(queryString, cb) {
-        console.log(queryString )
-        clearTimeout(this.timeout);
-        this.timeout = setTimeout(() => {
-          // cb(results);
-        }, 3000 * Math.random());
-      },
-      createStateFilter(queryString) {
-        return (state) => {
-          return (state.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
-        };
+        const _cb = "findSuggestions"
+        const qsData = {
+          'wd': this._.trim(this.searchKeyWord),
+          'p': '3',
+          'cb': _cb,
+          't': new Date().getMilliseconds().toString()
+        }
+        this.$http({
+          method: 'get',
+          url: "http://suggestion.baidu.com",
+          params: qsData,
+        }).then(res => {
+          if (res.status === 200) {
+            //格式 findSuggestions({q:"电影",p:false,s:["电影天堂"]});
+            const cbNameStart = res.data.indexOf("(")
+            const cbNameEnd = res.data.indexOf(")")
+            let resultData = res.data.substring(cbNameStart + 1, cbNameEnd).replace("\\","") // 获取（）中部分
+
+            //字符串处理q=>"q" 否则JSON.parse解析不了
+            const tempResultData = []
+            resultData.split(",").forEach(item => {
+              tempResultData.push(item.replace(/(\w+):/, "\"$1\":"))
+            })
+
+            //获取联想返回的数据，s属性
+            let resultData_s = tempResultData.join(",")
+            resultData_s = JSON.parse(resultData_s).s
+
+            if(resultData_s.length>0){
+              resultData_s.forEach(value => {
+                this.restaurants.push({"key": value, "value": value})
+              })
+            }else {
+              this.restaurants=[]
+            }
+
+            cb(this.restaurants);
+          }
+        }).catch(err => {
+          throw err
+        })
       },
       handleSelect(item) {
         console.log(item);
+        window.open('https://www.baidu.com/s?wd='+item.key)
       }
     }
   }

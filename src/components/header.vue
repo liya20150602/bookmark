@@ -9,20 +9,40 @@
       </div>
       <div class="login" >
         <a  @click="dialogFormVisible = true">登录</a>
+        <a  @click="regFormVisible = true">注册</a>
       </div>
-      <el-dialog title="注册|登录" :visible.sync="dialogFormVisible">
+      <el-dialog title="登录" :rules="rules" ref="loginForm" :visible.sync="dialogFormVisible" custom-class="loginForm">
         <el-form :model="form">
-          <el-form-item label="手机号" :label-width="formLabelWidth">
-            <el-input v-model="form.tel" auto-complete="off"></el-input>
-            <a href=""> 获取验证码</a>
+          <el-form-item label="用户名" :label-width="formLabelWidth">
+            <el-input v-model="form.userName" auto-complete="off"></el-input>
           </el-form-item>
-          <el-form-item label="验证码" :label-width="formLabelWidth">
-            <el-input v-model="form.code" auto-complete="off"></el-input>
+          <el-form-item label="密码" :label-width="formLabelWidth">
+            <el-input v-model="form.pwd" auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="密码" :label-width="formLabelWidth">
+            <el-input v-model="form.pwd" auto-complete="off"></el-input>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="dialogFormVisible = false">取 消</el-button>
-          <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+          <el-button type="primary" @click="login('loginForm')">确 定</el-button>
+        </div>
+      </el-dialog>
+      <el-dialog title="注册" :visible.sync="regFormVisible"  ref="regForm"custom-class="regForm">
+        <el-form :model="regForm">
+          <el-form-item label="用户名" :label-width="formLabelWidth">
+            <el-input v-model="regForm.userName" auto-complete="off" id="regFormUserName"></el-input>
+          </el-form-item>
+          <el-form-item label="密码" :label-width="formLabelWidth">
+            <el-input v-model="regForm.pwd" auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="邮箱" :label-width="formLabelWidth">
+            <el-input v-model="regForm.email" auto-complete="off"></el-input>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="regFormVisible = false">取 消</el-button>
+          <el-button type="primary" @click="register('regForm')">确 定</el-button>
         </div>
       </el-dialog>
     </div>
@@ -30,16 +50,39 @@
 </template>
 
 <script type="text/ecmascript-6">
-  import service from './../api/service.js';
+  import service from '@/api/service'
+  import AsyncValidator from 'async-validator'
 export default {
   name: 'top',
   data(){
     return {
       time: '',
       dialogFormVisible: false,
+      regFormVisible:false,
       form: {
-        tel: '',
-        code: ''
+        userName: '',
+        pwd: ''
+      },
+      rules: {
+        userName: [
+          {required: true, message: '请输入用户名', trigger: 'blur'}
+        ],
+        pwd: [
+          {required: true, message: '请输入密码', trigger: 'blur'}
+        ]
+      },
+      regForm:{
+        userName: '',
+        pwd: ''
+      },
+      regRules: {
+        userName: [
+          {required: true, message: '请输入用户名', trigger: 'blur'}
+        ],
+        pwd: [
+          {required: true, message: '请输入密码', trigger: 'blur'}
+        ],
+        email:[]
       },
       formLabelWidth: '120px'
     }
@@ -47,6 +90,14 @@ export default {
   mounted(){
     this.initWeather()
     this.formatTime()
+  },
+  watch:{
+    'regForm.userName'(val){
+      this.checkUserName()
+    },
+    'regForm.email'(val){
+      this.checkEmail()
+    }
   },
   methods:{
     initWeather(){
@@ -72,8 +123,61 @@ export default {
       },1000)
 
     },
-    login(){
-      console.log("登录")
+    login(formName){
+      const para={
+        account:this.form.userName,
+        password:this.form.pwd
+      }
+      const validate = new AsyncValidator(this.rules)
+      // this.$refs[formName].validate((valid) => {
+      //   if (valid) {
+          service.login(para).then(data=>{
+            // this.dialogFormVisible=false
+          }).catch(err=>{
+
+          })
+      //   } else {
+      //     console.log('error submit!!');
+      //     return false;
+      //   }
+      // });
+
+
+
+    },
+    checkUserName(){
+      service.checkLoginName({loginName:this.regForm.userName}).then(data=>{
+
+      }).catch(err=>{
+
+      })
+    },
+    checkEmail(){
+      service.checkEmail({email:this.regForm.email}).then(data=>{
+
+      }).catch(err=>{
+
+      })
+    },
+    register(formName){
+      const validate = new AsyncValidator(this.rules)
+      const para={
+        loginName:this.regForm.userName,
+        password:this.regForm.pwd,
+        email:this.regForm.email
+      }
+      // this.$refs[formName].validate((valid) => {
+      //   if (valid) {
+      service.register(para).then(data=>{
+        this.regFormVisible=false
+      }).catch(err=>{
+
+      })
+      //   } else {
+      //     console.log('error submit!!');
+      //     return false;
+      //   }
+      // });
     }
   }
 }
@@ -113,10 +217,14 @@ export default {
         cursor: pointer;
         a{
           height: 100%;
-          display: block;
+          &+a{
+            padding-left: 10px;
+          }
         }
       }
     }
   }
-
+  .loginForm{
+    width: 300px;
+  }
 </style>

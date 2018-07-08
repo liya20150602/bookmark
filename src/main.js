@@ -7,12 +7,14 @@ import App from './App'
 import router from './router'
 import axios from 'axios'
 import moment from 'moment'
+import loadash from 'Lodash'
 
 Vue.use(ElementUI);
 
 Vue.config.productionTip = false
 Vue.prototype.$http=axios
 Vue.prototype.$moment=moment
+Vue.prototype._=loadash
 
 /* eslint-disable no-new */
 new Vue({

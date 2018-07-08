@@ -14,5 +14,17 @@ class service extends BaseModule{
   getBookmarks(data){
     return this.post(api.getBookmarks, data)
   }
+  login(data){
+    return this.post(api.login, data)
+  }
+  checkLoginName(data){
+    return this.get(api.checkLoginName,data)
+  }
+  checkEmail(data){
+    return this.get(api.checkEmail,data)
+  }
+  register(data){
+    return this.post(api.register,data)
+  }
 }
 export default  new service()

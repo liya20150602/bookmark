@@ -1,6 +1,6 @@
 <template>
   <div >
-    <div class="main">
+    <div class="main" :style="{zoom:zoom}">
       <top></top>
       <search></search>
       <tab ></tab>
@@ -23,13 +23,21 @@
     components: {top, search, tab},
     data() {
       return {
-        bgImgId: ''
+        bgImgId: '',
+        zoom:1
       }
     },
     mounted() {
       this.getRandomBgImg()
+      window.addEventListener("resize",this.getZoom)
     },
     methods: {
+      getZoom(){
+        const $clientWidth = window.screen.width;
+        const $bodyWidth = document.body.clientWidth;
+        let ratio = ($bodyWidth / $clientWidth).toFixed(2)
+        this.zoom = ratio < 0.5 ? 0.5 : ratio
+      },
       getRandomBgImg() {
         let param = {}
         if (this.bgImgId !== '') {
