@@ -5,7 +5,7 @@
       <el-option label="百度" value="baidu"></el-option>
       <el-option label="必应" value="bing"></el-option>
     </el-select>
-    <el-autocomplete
+    <el-autocomplete class="auto-search"
       v-model="searchKeyWord"
       :fetch-suggestions="querySearchAsync"
       placeholder="请输入内容"

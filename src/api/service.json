@@ -4,7 +4,7 @@
     "url":"apis/v3/location/search.json"
   },
   "getRandomBgImg":{
-    "method":"post",
+    "method":"get",
     "url":"apis/bookmark/bgImg/getRandomBgImg/"
   },
   "getBookmarkCategory":{
@@ -12,7 +12,7 @@
     "url":"apis/bookmark/bookmark/getBookmarkCategory/"
   },
   "getBookmarks":{
-    "method":"post",
+    "method":"get",
     "url":"apis/bookmark/bookmark/getBookmarks/"
   },
   "login":{

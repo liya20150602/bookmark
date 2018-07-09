@@ -6,13 +6,13 @@ import api from './service.json';
 
 class service extends BaseModule{
   getRandomBgImg(data){
-   return  this.post(api.getRandomBgImg,data)
+   return  this.get(api.getRandomBgImg,data)
   }
   getBookmarkCategory(){
     return this.get(api.getBookmarkCategory)
   }
   getBookmarks(data){
-    return this.post(api.getBookmarks, data)
+    return this.get(api.getBookmarks, data)
   }
   login(data){
     return this.post(api.login, data)

@@ -128,19 +128,19 @@ export default {
         account:this.form.userName,
         password:this.form.pwd
       }
-      const validate = new AsyncValidator(this.rules)
-      // this.$refs[formName].validate((valid) => {
-      //   if (valid) {
+      console.log(this.$refs[formName])
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
           service.login(para).then(data=>{
             // this.dialogFormVisible=false
           }).catch(err=>{
 
           })
-      //   } else {
-      //     console.log('error submit!!');
-      //     return false;
-      //   }
-      // });
+        } else {
+          console.log('error submit!!');
+          return false;
+        }
+      });
 
 
 
@@ -191,6 +191,7 @@ export default {
       width: 90%;
       margin: 0 auto;
       height: 40px;
+      color:#fff;
       .logo{
         width:88px;
         height:100%;
@@ -213,7 +214,7 @@ export default {
         line-height: 40px;
         width: 10%;
         height: 40px;
-        color: #535FFF;
+        color: #fff;
         cursor: pointer;
         a{
           height: 100%;

@@ -130,7 +130,17 @@
   .tabs {
     width: 80%;
     margin: 20px auto;
-
+    color:#fff;
+    .el-tabs--border-card{
+      >.el-tabs__header{
+        background:rgba(0,0,0,0.2);
+        border-bottom:0
+      }
+      background-color: transparent;
+      border:0;
+      box-shadow:none;
+      -webkit-box-shadow: none;
+    }
     ul {
       text-align: left;
       li {
