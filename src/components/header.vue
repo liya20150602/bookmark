@@ -11,16 +11,14 @@
         <a  @click="dialogFormVisible = true">登录</a>
         <a  @click="regFormVisible = true">注册</a>
       </div>
-      <el-dialog title="登录" :rules="rules" ref="loginForm" :visible.sync="dialogFormVisible" custom-class="loginForm">
-        <el-form :model="form">
-          <el-form-item label="用户名" :label-width="formLabelWidth">
+      <el-dialog title="登录"  :visible.sync="dialogFormVisible" custom-class="loginForm">
+        <p class="error" v-if="loginErr">{{loginErr}}</p>
+        <el-form :model="form" :rules="rules" ref="loginForm">
+          <el-form-item label="用户名" :label-width="formLabelWidth" prop="userName">
             <el-input v-model="form.userName" auto-complete="off"></el-input>
           </el-form-item>
-          <el-form-item label="密码" :label-width="formLabelWidth">
-            <el-input v-model="form.pwd" auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="密码" :label-width="formLabelWidth">
-            <el-input v-model="form.pwd" auto-complete="off"></el-input>
+          <el-form-item label="密码" :label-width="formLabelWidth" prop="pwd">
+            <el-input type="password" v-model="form.pwd" auto-complete="off"></el-input>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -28,18 +26,23 @@
           <el-button type="primary" @click="login('loginForm')">确 定</el-button>
         </div>
       </el-dialog>
-      <el-dialog title="注册" :visible.sync="regFormVisible"  ref="regForm"custom-class="regForm">
-        <el-form :model="regForm">
-          <el-form-item label="用户名" :label-width="formLabelWidth">
-            <el-input v-model="regForm.userName" auto-complete="off" id="regFormUserName"></el-input>
+      <el-dialog title="注册" :visible.sync="regFormVisible"  custom-class="regForm">
+        <el-form :model="ruleForm2" status-icon :rules="rules2" ref="regForm" label-width="100px" class="demo-ruleForm">
+          <el-form-item label="密码" prop="pwd">
+            <el-input type="password" v-model="ruleForm2.pwd" auto-complete="off"></el-input>
           </el-form-item>
-          <el-form-item label="密码" :label-width="formLabelWidth">
-            <el-input v-model="regForm.pwd" auto-complete="off"></el-input>
+          <el-form-item label="确认密码" prop="checkPass">
+            <el-input type="password" v-model="ruleForm2.checkPass" auto-complete="off"></el-input>
           </el-form-item>
-          <el-form-item label="邮箱" :label-width="formLabelWidth">
-            <el-input v-model="regForm.email" auto-complete="off"></el-input>
+          <el-form-item label="年龄" prop="age">
+            <el-input v-model.number="ruleForm2.age"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="submitForm('regForm')">提交</el-button>
+            <el-button @click="resetForm('ruleForm2')">重置</el-button>
           </el-form-item>
         </el-form>
+
         <div slot="footer" class="dialog-footer">
           <el-button @click="regFormVisible = false">取 消</el-button>
           <el-button type="primary" @click="register('regForm')">确 定</el-button>
@@ -55,6 +58,18 @@
 export default {
   name: 'top',
   data(){
+
+    var validatePass = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请输入密码'));
+      } else {
+        // this.checkEmail(callback)
+        if (this.ruleForm2.pwd !== '') {
+          this.$refs.regForm.validateField('pwd');
+        }
+        callback();
+      }
+    };
     return {
       time: '',
       dialogFormVisible: false,
@@ -71,20 +86,24 @@ export default {
           {required: true, message: '请输入密码', trigger: 'blur'}
         ]
       },
-      regForm:{
-        userName: '',
-        pwd: ''
-      },
       regRules: {
-        userName: [
-          {required: true, message: '请输入用户名', trigger: 'blur'}
-        ],
         pwd: [
-          {required: true, message: '请输入密码', trigger: 'blur'}
-        ],
-        email:[]
+          { validator: validatePass, trigger: 'blur' }
+        ]
       },
-      formLabelWidth: '120px'
+
+      formLabelWidth: '120px',
+      loginErr:'',
+      ruleForm2: {
+        pwd: '',
+        checkPass: '',
+        age: ''
+      },
+      rules2: {
+        pwd: [
+          { validator: validatePass, trigger: 'blur' }
+        ]
+      }
     }
   },
   mounted(){
@@ -134,13 +153,14 @@ export default {
           service.login(para).then(data=>{
             // this.dialogFormVisible=false
           }).catch(err=>{
-
+            this.loginErr=err.msg
           })
         } else {
           console.log('error submit!!');
           return false;
         }
       });
+
 
 
 
@@ -154,30 +174,29 @@ export default {
     },
     checkEmail(){
       service.checkEmail({email:this.regForm.email}).then(data=>{
-
+console.log(new Error("邮箱已经存在"))
       }).catch(err=>{
 
       })
     },
     register(formName){
-      const validate = new AsyncValidator(this.rules)
       const para={
         loginName:this.regForm.userName,
         password:this.regForm.pwd,
         email:this.regForm.email
       }
-      // this.$refs[formName].validate((valid) => {
-      //   if (valid) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
       service.register(para).then(data=>{
         this.regFormVisible=false
       }).catch(err=>{
 
       })
-      //   } else {
-      //     console.log('error submit!!');
-      //     return false;
-      //   }
-      // });
+        } else {
+          console.log('error submit!!');
+          return false;
+        }
+      });
     }
   }
 }

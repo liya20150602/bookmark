@@ -59,7 +59,8 @@
     },
     methods: {
       getBookmarkCategory() {
-        service.getBookmarkCategory().then(data => {
+        service.getBookmarkCategory().then(res => {
+          const data=res.data
           data.forEach(value => {
             if (value.current) {
               this.activeName = value.categoryName
@@ -72,7 +73,7 @@
       },
       getBookmarks(categoryId){
         service.getBookmarks({categoryId:categoryId}).then(data=>{
-          this.bookmarks = data
+          this.bookmarks = data.data
         })
       },
       jumpUrlOrPanel(item){

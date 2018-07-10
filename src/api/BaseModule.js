@@ -28,10 +28,10 @@ class BaseModule {
     this.$http.interceptors.response.use(response => {
 
       if(response.status==200){
-          if(response.data.state==1){
-              return Promise.resolve(response.data.data)
-            }else {
+          if(response.data.state==2){
             Message.error('服务器接口错误');
+            }else {
+            return Promise.resolve(response.data)
           }
       }else {
         return Promise.reject()

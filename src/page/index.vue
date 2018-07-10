@@ -44,9 +44,10 @@
           param = {id: this.bgImgId}
         }
         service.getRandomBgImg(param).then(res => {
-          this.bgImgId = res.id
+          console.log(res)
+          this.bgImgId = res.data.id
           const $body = document.getElementsByTagName("body")[0]
-          $body.style.background = "url('" + res.bgImgUrl + "') no-repeat 0 center"
+          $body.style.background = "url('" + res.data.bgImgUrl + "') no-repeat 0 center"
           $body.style.backgroundSize = "100%"
         }).catch(err => {
           console.log(err)
