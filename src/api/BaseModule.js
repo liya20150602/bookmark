@@ -18,8 +18,6 @@ class BaseModule {
     })
     this.$http.interceptors.request.use(config => {
       // loading
-      console.log("-----")
-      console.log(config)
       return config
     }, error => {
       return Promise.reject(error)
@@ -28,7 +26,7 @@ class BaseModule {
     this.$http.interceptors.response.use(response => {
 
       if(response.status==200){
-          if(response.data.state==2){
+          if(response.data.state==0){
             Message.error('服务器接口错误');
             }else {
             return Promise.resolve(response.data)
@@ -46,7 +44,7 @@ class BaseModule {
     return this.$http({
       method: 'post',
       url: url.url,
-      data: qs.stringify(data),
+      data: data,
       timeout: 10000,
       headers: {
         'X-Requested-With': 'XMLHttpRequest',

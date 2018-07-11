@@ -7,46 +7,52 @@
       <div class="systemTime">
         {{time}}
       </div>
-      <div class="login" >
+      <div class="login" v-if="!userInfo">
         <a  @click="dialogFormVisible = true">登录</a>
         <a  @click="regFormVisible = true">注册</a>
       </div>
-      <el-dialog title="登录"  :visible.sync="dialogFormVisible" custom-class="loginForm">
-        <p class="error" v-if="loginErr">{{loginErr}}</p>
-        <el-form :model="form" :rules="rules" ref="loginForm">
+      <div class="personal" v-else>
+        <el-dropdown trigger="click"@command="handleCommand">
+          <span class="el-dropdown-link">
+            {{userInfo.loginName}}<i class="el-icon-arrow-down el-icon--right"></i>
+          </span>
+          <el-dropdown-menu slot="dropdown"  >
+            <el-dropdown-item command="logout">退出</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+      </div>
+      <el-dialog title="登录"  :visible.sync="dialogFormVisible" width="460px" custom-class="loginForm">
+        <p class="error" v-if="loginErr"><i class="el-icon-warning"></i>{{loginErr}}</p>
+        <el-form :model="loginForm" :rules="rules" ref="loginForm">
           <el-form-item label="用户名" :label-width="formLabelWidth" prop="userName">
-            <el-input v-model="form.userName" auto-complete="off"></el-input>
+            <el-input v-model="loginForm.userName" auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="密码" :label-width="formLabelWidth" prop="pwd">
-            <el-input type="password" v-model="form.pwd" auto-complete="off"></el-input>
+            <el-input type="password" v-model="loginForm.pwd" auto-complete="off"></el-input>
+          </el-form-item>
+          <el-form-item >
+            <el-button @click="dialogFormVisible = false">关 闭</el-button>
+            <el-button type="primary" @click="login('loginForm')">登 录 </el-button>
           </el-form-item>
         </el-form>
-        <div slot="footer" class="dialog-footer">
-          <el-button @click="dialogFormVisible = false">取 消</el-button>
-          <el-button type="primary" @click="login('loginForm')">确 定</el-button>
-        </div>
       </el-dialog>
-      <el-dialog title="注册" :visible.sync="regFormVisible"  custom-class="regForm">
-        <el-form :model="ruleForm2" status-icon :rules="rules2" ref="regForm" label-width="100px" class="demo-ruleForm">
+      <el-dialog title="注册" :visible.sync="regFormVisible" width="460px" custom-class="regForm">
+        <p class="error" v-if="regErr"><i class="el-icon-warning"></i>{{regErr}}</p>
+        <el-form :model="regForm" status-icon :rules="regRules" ref="regForm" label-width="100px" class="demo-ruleForm">
+          <el-form-item label="用户名" prop="userName">
+            <el-input  maxlength="100" v-model="regForm.userName" auto-complete="off"></el-input>
+          </el-form-item>
           <el-form-item label="密码" prop="pwd">
-            <el-input type="password" v-model="ruleForm2.pwd" auto-complete="off"></el-input>
+            <el-input type="password" minlength="6" v-model="regForm.pwd" auto-complete="off"></el-input>
           </el-form-item>
-          <el-form-item label="确认密码" prop="checkPass">
-            <el-input type="password" v-model="ruleForm2.checkPass" auto-complete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="年龄" prop="age">
-            <el-input v-model.number="ruleForm2.age"></el-input>
+          <el-form-item label="邮箱" prop="email">
+            <el-input  v-model="regForm.email" auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="submitForm('regForm')">提交</el-button>
-            <el-button @click="resetForm('ruleForm2')">重置</el-button>
+            <el-button @click="regFormVisible = false">关 闭</el-button>
+            <el-button type="primary" @click="register('regForm')">注 册</el-button>
           </el-form-item>
         </el-form>
-
-        <div slot="footer" class="dialog-footer">
-          <el-button @click="regFormVisible = false">取 消</el-button>
-          <el-button type="primary" @click="register('regForm')">确 定</el-button>
-        </div>
       </el-dialog>
     </div>
   </div>
@@ -59,22 +65,35 @@ export default {
   name: 'top',
   data(){
 
-    var validatePass = (rule, value, callback) => {
+    var validateUserName = (rule, value, callback) => {
       if (value === '') {
-        callback(new Error('请输入密码'));
+        callback(new Error('请输入用户名'));
       } else {
-        // this.checkEmail(callback)
-        if (this.ruleForm2.pwd !== '') {
-          this.$refs.regForm.validateField('pwd');
+        if(value.length<100){
+          this.checkUserName(callback)
+        }else {
+          callback(new Error('用户名太长'));
         }
-        callback();
+
       }
     };
+    var validateEmail=(rule,value,callback)=>{
+      if (value === '') {
+        callback(new Error('请输入邮箱'));
+      } else {
+        var re = /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,4}$/;
+        if(re.test(value)){
+          this.checkEmail(callback)
+        }else {
+          callback(new Error('请输入正确的邮箱地址'));
+        }
+      }
+    }
     return {
       time: '',
       dialogFormVisible: false,
       regFormVisible:false,
-      form: {
+      loginForm: {
         userName: '',
         pwd: ''
       },
@@ -86,36 +105,49 @@ export default {
           {required: true, message: '请输入密码', trigger: 'blur'}
         ]
       },
-      regRules: {
-        pwd: [
-          { validator: validatePass, trigger: 'blur' }
-        ]
-      },
-
-      formLabelWidth: '120px',
-      loginErr:'',
-      ruleForm2: {
+      regForm: {
         pwd: '',
         checkPass: '',
         age: ''
       },
-      rules2: {
+      regRules: {
+        userName: [
+          { required: true,validator: validateUserName, trigger: 'blur' }
+        ],
         pwd: [
-          { validator: validatePass, trigger: 'blur' }
+          { required: true, pattern: /^.*(?=.{6,})(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*? ]).*$/,trigger: 'change', message: '不少于6位，包含大小写，数字，特殊字符',}
+        ],
+        email: [
+          {required: true,type:'email',validator: validateEmail, trigger: 'change' }
         ]
-      }
+      },
+
+      formLabelWidth: '80px',
+      loginErr:'',
+      regErr:'',
+      userInfo:''
     }
   },
   mounted(){
     this.initWeather()
     this.formatTime()
+    this.getUserInfo()
   },
   watch:{
-    'regForm.userName'(val){
-      this.checkUserName()
+    'loginForm.userName':function (val) {
+      this.loginErr=''
     },
-    'regForm.email'(val){
-      this.checkEmail()
+    'loginForm.pwd':function (val) {
+      this.loginErr=''
+    },
+    'regForm.userName':function (val) {
+      this.regErr=''
+    },
+    'regForm.pwd':function (val) {
+      this.regErr=''
+    },
+    'regForm.email':function (val) {
+      this.regErr=''
     }
   },
   methods:{
@@ -144,14 +176,19 @@ export default {
     },
     login(formName){
       const para={
-        account:this.form.userName,
-        password:this.form.pwd
+        account:this.loginForm.userName,
+        password:this.loginForm.pwd
       }
-      console.log(this.$refs[formName])
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          service.login(para).then(data=>{
-            // this.dialogFormVisible=false
+          service.login(para).then(res=>{
+            if(res.state==1){
+              // 登录成功
+              localStorage.setItem('userInfo',JSON.stringify(res.data))
+              this.dialogFormVisible=false
+            }else {
+              this.loginErr=res.msg
+            }
           }).catch(err=>{
             this.loginErr=err.msg
           })
@@ -160,23 +197,27 @@ export default {
           return false;
         }
       });
-
-
-
-
     },
-    checkUserName(){
+    checkUserName(callback){
       service.checkLoginName({loginName:this.regForm.userName}).then(data=>{
-
+        if(data.state==2){
+          callback(new Error("用户名已经存在"))
+        }else {
+          callback()
+        }
       }).catch(err=>{
-
+        callback(new Error("接口错误请稍后重试"))
       })
     },
-    checkEmail(){
+    checkEmail(callback){
       service.checkEmail({email:this.regForm.email}).then(data=>{
-console.log(new Error("邮箱已经存在"))
+        if(data.state==2){
+          callback(new Error("邮箱已经存在"))
+        }else {
+          callback()
+        }
       }).catch(err=>{
-
+        callback(new Error("接口错误请稍后重试"))
       })
     },
     register(formName){
@@ -188,7 +229,14 @@ console.log(new Error("邮箱已经存在"))
       this.$refs[formName].validate((valid) => {
         if (valid) {
       service.register(para).then(data=>{
-        this.regFormVisible=false
+        if(data.state){
+          //注册成功
+          localStorage.setItem('userInfo',JSON.stringify(res.data))
+          this.regFormVisible=false
+        }else {
+          //注册失败
+        }
+
       }).catch(err=>{
 
       })
@@ -197,6 +245,29 @@ console.log(new Error("邮箱已经存在"))
           return false;
         }
       });
+    },
+    getUserInfo(){
+      let userInfo=localStorage.getItem('userInfo')
+      if(userInfo){
+        userInfo=JSON.parse(userInfo)
+      }
+      this.userInfo=userInfo
+    },
+    handleCommand(command){
+      console.log(command)
+      if(command=="logout"){
+        this.logout()
+      }
+    },
+    logout(){
+      service.logout().then(res=>{
+        if(res.state==1){
+          // 登出成功
+          localStorage.setItem('userInfo','')
+          this.userInfo=""
+        }
+      }).catch(err=>{
+      })
     }
   }
 }
@@ -227,7 +298,8 @@ console.log(new Error("邮箱已经存在"))
         width:70%;
         line-height: 40px;
       }
-      .login{
+      .login,
+      .personal{
         float: right;
         display: inline-block;
         line-height: 40px;
@@ -241,6 +313,16 @@ console.log(new Error("邮箱已经存在"))
             padding-left: 10px;
           }
         }
+        .el-dropdown{
+          color: #fff;
+        }
+      }
+    }
+    .error{
+      color:red;
+      padding-bottom: 20px;
+      i{
+        padding-right: 4px;
       }
     }
   }

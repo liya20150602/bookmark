@@ -15,18 +15,19 @@
             <a @click="jumpUrlOrPanel(item)" class="tab-icon" :class="{opacity:delBtnShow}" target="_blank" @contextmenu.prevent="rightClick">
               <div v-if="item.bookmarkPhoto && !item.bookmarkColor" class="tab-icon-img":style="{backgroundImage:'url('+require('./../assets/icon/tianmao.png')+')'}">
                 <i v-show="delBtnShow" class="delete-btn el-icon-circle-close-outline" @click.stop="delUrl"></i>
-                <i v-show="editBtnShow" @click.stop="editUrl" class="edit-btn el-icon-edit-outline"></i>
+                <i v-show="editBtnShow" @click.stop="editUrl(item)" class="edit-btn el-icon-edit-outline"></i>
               </div>
               <div v-if="!item.bookmarkPhoto && item.bookmarkColor" :style="{backgroundColor:item.bookmarkColor}" class="tab-icon-default">
                 {{item.bookmarkTitle.substring(0,2)}}
                 <i v-show="delBtnShow" class="delete-btn el-icon-circle-close-outline" @click.stop="delUrl"></i>
-                <i v-show="editBtnShow" @click.stop="editUrl" class="edit-btn el-icon-edit-outline"></i></div>
+                <i v-show="editBtnShow" @click.stop="editUrl(item)" class="edit-btn el-icon-edit-outline"></i></div>
             </a>
             <p>{{item.bookmarkTitle}}</p>
           </li>
         </ul>
       </el-tab-pane>
     </el-tabs>
+    <editSidebar :show="showEditSidebar" :close="closeEditSidebar" :item="selectItem"></editSidebar>
   </div>
 
 </template>
@@ -34,6 +35,7 @@
 <script>
   import animate from 'animate.css'
   import service from '@/api/service'
+  import editSidebar from '@/components/editSidebar'
 
   export default {
     data() {
@@ -43,9 +45,12 @@
         editBtnShow: false,
         del: false,
         categoryTabs: [],
-        bookmarks:[]
+        bookmarks:[],
+        showEditSidebar:false,
+        selectItem:''
       };
     },
+    components:{editSidebar},
     props: {
       clickCount: Number
     },
@@ -91,8 +96,9 @@
       rightClick(){
         this.delBtnShow = true
       },
-      editUrl() {
-
+      editUrl(item) {
+        this.showEditSidebar=true
+        this.selectItem=item
         console.log("eidt")
       },
       delUrl() {
@@ -110,6 +116,9 @@
           this.editBtnShow = false
           console.log("删除状态下，鼠标移出")
         }
+      },
+      closeEditSidebar(item){
+      this.showEditSidebar=false
       }
     }
   };

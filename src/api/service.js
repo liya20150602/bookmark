@@ -26,5 +26,8 @@ class service extends BaseModule{
   register(data){
     return this.post(api.register,data)
   }
+  logout(){
+    return this.get(api.logout)
+  }
 }
 export default  new service()
