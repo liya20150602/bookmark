@@ -11,18 +11,27 @@
           <li :key="item.id"
               v-for="(item,index) in bookmarks"
               :class="{'animated1':delBtnShow, 'shake':delBtnShow,'zoomOutDown':del}"
-              @mouseenter.stop="liMouseEnter" @mouseleave.stop="liMouseLeaveOut">
-            <a @click="jumpUrlOrPanel(item)" class="tab-icon" :class="{opacity:delBtnShow}" target="_blank" @contextmenu.prevent="rightClick">
-              <div v-if="item.bookmarkPhoto && !item.bookmarkColor" class="tab-icon-img":style="{backgroundImage:'url('+item.bookmarkPhoto+')'}">
+              @mouseenter.stop="liMouseEnter(item)" @mouseleave.stop="liMouseLeaveOut(item)">
+            <a @click="jumpUrlOrPanel(item)" class="tab-icon"  target="_blank" @contextmenu.prevent="rightClick">
+              <div  v-if="item.bookmarkPhoto && !item.bookmarkColor"
+                    class="tab-icon-img"
+                    :class="{opacity:delBtnShow}"
+                    :style="{backgroundImage:'url('+item.bookmarkPhoto+')'}">
+                <div class="tab-icon-option" ></div>
                 <i v-show="delBtnShow" class="delete-btn el-icon-circle-close-outline" @click.stop="delUrl"></i>
-                <i v-show="editBtnShow" @click.stop="editUrl(item)" class="edit-btn el-icon-edit-outline"></i>
+                <i v-show="item.editBtnShow" @click.stop="editUrl(item)" class="edit-btn el-icon-edit-outline"></i>
               </div>
-              <div v-if="!item.bookmarkPhoto && item.bookmarkColor" :style="{backgroundColor:item.bookmarkColor}" class="tab-icon-default">
+              <div v-if="!item.bookmarkPhoto && item.bookmarkColor"
+                   class="tab-icon-default"
+                   :class="{opacity:delBtnShow}"
+                   :style="{backgroundColor:item.bookmarkColor}">
                 {{item.bookmarkTitle.substring(0,2)}}
+                <div class="tab-icon-option"   ></div>
                 <i v-show="delBtnShow" class="delete-btn el-icon-circle-close-outline" @click.stop="delUrl"></i>
-                <i v-show="editBtnShow" @click.stop="editUrl(item)" class="edit-btn el-icon-edit-outline"></i></div>
+                <i v-show="item.editBtnShow" @click.stop="editUrl(item)" class="edit-btn el-icon-edit-outline"></i>
+              </div>
             </a>
-            <p>{{item.bookmarkTitle}}</p>
+            <p>{{item.bookmarkTitle}}{{item.editBtnShow}}</p>
           </li>
         </ul>
       </el-tab-pane>
@@ -106,15 +115,15 @@
         this.del = true
         console.log('确认删除')
       },
-      liMouseEnter(event) {
+      liMouseEnter(item) {
         if (this.delBtnShow) {
-          this.editBtnShow = true
-          console.log("删除状态下，鼠标依")
+          item.editBtnShow = true
+          console.log("删除状态下，鼠标依",item)
         }
       },
-      liMouseLeaveOut() {
+      liMouseLeaveOut(item) {
         if (this.delBtnShow) {
-          this.editBtnShow = false
+          item.editBtnShow = false
           console.log("删除状态下，鼠标移出")
         }
       },
@@ -176,11 +185,21 @@
             background-position: center;
             background-size: 100%;
             box-shadow: rgba(0,0,0,.3) 1px 1px 10px;
+            .tab-icon-option{
+              width: 100%;
+              position: absolute;
+              top:0;
+              left:0;
+              bottom:0;
+              z-index: 1;
+            }
             .delete-btn {
               position: absolute;
-              top: -4px;
-              right: -7px;
+              top: -12px;
+              right: -14px;
               width: 20px;
+              z-index: 2;
+              font-size: 24px;
             }
             .edit-btn {
               position: absolute;
@@ -189,25 +208,27 @@
               width: 50%;
               height: 43%;
               font-size: 36px;
-              color: #fff;
+              color: #666;
               transform: translate(-50%, -50%);
+              z-index: 2;
             }
-          }
-          &.opacity:hover {
-            opacity: 0.5;
           }
           .tab-icon-default{
            background-color: #eee;
             line-height: 110px;
           }
-        }
 
+        }
         p{
           margin-top:10px;
         }
         a:hover {
           img {
             box-shadow: 1px 1px 8px 2px rgba(70, 107, 208, 0.2);
+          }
+          .opacity{
+            background-color:rgba(255,255,255,0.7);
+            border-radius: 10%;
           }
 
         }
