@@ -13,7 +13,7 @@
               :class="{'animated1':delBtnShow, 'shake':delBtnShow,'zoomOutDown':del}"
               @mouseenter.stop="liMouseEnter" @mouseleave.stop="liMouseLeaveOut">
             <a @click="jumpUrlOrPanel(item)" class="tab-icon" :class="{opacity:delBtnShow}" target="_blank" @contextmenu.prevent="rightClick">
-              <div v-if="item.bookmarkPhoto && !item.bookmarkColor" class="tab-icon-img":style="{backgroundImage:'url('+require('./../assets/icon/tianmao.png')+')'}">
+              <div v-if="item.bookmarkPhoto && !item.bookmarkColor" class="tab-icon-img":style="{backgroundImage:'url('+item.bookmarkPhoto+')'}">
                 <i v-show="delBtnShow" class="delete-btn el-icon-circle-close-outline" @click.stop="delUrl"></i>
                 <i v-show="editBtnShow" @click.stop="editUrl(item)" class="edit-btn el-icon-edit-outline"></i>
               </div>
@@ -27,7 +27,7 @@
         </ul>
       </el-tab-pane>
     </el-tabs>
-    <editSidebar :show="showEditSidebar" :close="closeEditSidebar" :item="selectItem"></editSidebar>
+    <editSidebar v-if="showEditSidebar"  :close="closeEditSidebar" :item="selectItem"></editSidebar>
   </div>
 
 </template>
@@ -47,7 +47,7 @@
         categoryTabs: [],
         bookmarks:[],
         showEditSidebar:false,
-        selectItem:''
+        selectItem:{}
       };
     },
     components:{editSidebar},
@@ -98,6 +98,7 @@
       },
       editUrl(item) {
         this.showEditSidebar=true
+        console.log("item",item)
         this.selectItem=item
         console.log("eidt")
       },
