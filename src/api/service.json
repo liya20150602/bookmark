@@ -7,13 +7,21 @@
     "method":"get",
     "url":"apis/bookmark/bgImg/getRandomBgImg/"
   },
-  "getBookmarkCategory":{
+  "getSysBookmarkCategory":{
     "method":"get",
-    "url":"apis/bookmark/bookmark/getBookmarkCategory/"
+    "url":"apis/bookmark/bookmark/getSysBookmarkCategory/"
   },
-  "getBookmarks":{
+  "getUserBookmarkCategory":{
     "method":"get",
-    "url":"apis/bookmark/bookmark/getBookmarks/"
+    "url":"apis/bookmark/bookmark/getUserBookmarkCategory/"
+  },
+  "getSysBookmarks":{
+    "method":"get",
+    "url":"apis/bookmark/bookmark/getSysBookmarks/"
+  },
+  "getUserBookmarks":{
+    "method":"get",
+    "url":"apis/bookmark/bookmark/getUserBookmarks/"
   },
   "login":{
     "method":"post",

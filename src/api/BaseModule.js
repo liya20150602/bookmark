@@ -4,6 +4,7 @@
 import axios from 'axios'
 import qs from 'qs'
 import { Message } from 'element-ui'
+import utils from '@/utils/'
 
 
 class BaseModule {
@@ -16,8 +17,19 @@ class BaseModule {
       },
       withCredentials: true // 允许携带cookie
     })
+    const whiteUrl=["account/register","login/in","bookmark/getSysBookmarks","bookmark/getSysBookmarkCategory","bgImg/getRandomBgImg"]
     this.$http.interceptors.request.use(config => {
-      // loading
+      whiteUrl.forEach(x=>{
+        x="apis/bookmark/"+x+"/"
+        if(config.url==x){
+          return config
+        }
+        if(utils.getUserInfo()!==''){
+          // config.headers.common['authToken'] =getUserInfo().authToken
+        }
+        return config
+      })
+
       return config
     }, error => {
       return Promise.reject(error)
@@ -27,7 +39,9 @@ class BaseModule {
 
       if(response.status==200){
           if(response.data.state==0){
-            Message.error('服务器接口错误');
+            //token失效 清除token
+            utils.clearuserInfo()
+            window.load()
             }else {
             return Promise.resolve(response.data)
           }

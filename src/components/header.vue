@@ -28,7 +28,7 @@
             <el-input v-model="loginForm.userName" auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="密码" :label-width="formLabelWidth" prop="pwd">
-            <el-input type="password" v-model="loginForm.pwd" auto-complete="off"></el-input>
+            <el-input type="password" v-model="loginForm.pwd" auto-complete="off"  @keyup.enter="login('loginForm')"></el-input>
           </el-form-item>
           <el-form-item >
             <el-button @click="dialogFormVisible = false">关 闭</el-button>
@@ -43,10 +43,10 @@
             <el-input  maxlength="100" v-model="regForm.userName" auto-complete="off"></el-input>
           </el-form-item>
           <el-form-item label="密码" prop="pwd">
-            <el-input type="password" minlength="6" v-model="regForm.pwd" auto-complete="off"></el-input>
+            <el-input type="password" minlength="6" v-model="regForm.pwd" auto-complete="off" ></el-input>
           </el-form-item>
           <el-form-item label="邮箱" prop="email">
-            <el-input  v-model="regForm.email" auto-complete="off"></el-input>
+            <el-input  v-model="regForm.email" auto-complete="off" @keyup.enter="register('regForm')"></el-input>
           </el-form-item>
           <el-form-item>
             <el-button @click="regFormVisible = false">关 闭</el-button>
@@ -60,7 +60,9 @@
 
 <script type="text/ecmascript-6">
   import service from '@/api/service'
-  import AsyncValidator from 'async-validator'
+  import utils from '@/utils/'
+
+
 export default {
   name: 'top',
   data(){
@@ -131,7 +133,7 @@ export default {
   mounted(){
     this.initWeather()
     this.formatTime()
-    this.getUserInfo()
+    this.userInfo=utils.getUserInfo()
   },
   watch:{
     'loginForm.userName':function (val) {
@@ -177,15 +179,18 @@ export default {
     login(formName){
       const para={
         account:this.loginForm.userName,
-        password:this.loginForm.pwd
+        password:utils.md5Pwd(this.loginForm.pwd)
       }
       this.$refs[formName].validate((valid) => {
         if (valid) {
           service.login(para).then(res=>{
             if(res.state==1){
               // 登录成功
-              localStorage.setItem('userInfo',JSON.stringify(res.data))
+              const userInfo=JSON.stringify(Object.assign(res.data))
+              utils.setUserInfo(userInfo)
+              this.userInfo=userInfo
               this.dialogFormVisible=false
+              window.location.reload()
             }else {
               this.loginErr=res.msg
             }
@@ -223,35 +228,31 @@ export default {
     register(formName){
       const para={
         loginName:this.regForm.userName,
-        password:this.regForm.pwd,
+        password:utils.md5Pwd(this.regForm.pwd),
         email:this.regForm.email
       }
       this.$refs[formName].validate((valid) => {
         if (valid) {
-      service.register(para).then(data=>{
-        if(data.state){
-          //注册成功
-          localStorage.setItem('userInfo',JSON.stringify(res.data))
-          this.regFormVisible=false
-        }else {
-          //注册失败
-        }
+          service.register(para).then(data=>{
+            console.log(data,data.state==1,JSON.stringify(data.data))
+            if(data.state==1){
+              //注册成功
+              const userInfo=JSON.stringify(Object.assign(data.data,{"loginName":this.regForm.userName}))
+              utils.setUserInfo(userInfo)
+              this.userInfo=userInfo
+              this.regFormVisible=false
+            }else {
+              //注册失败
+            }
 
-      }).catch(err=>{
+          }).catch(err=>{
 
-      })
+          })
         } else {
           console.log('error submit!!');
           return false;
         }
       });
-    },
-    getUserInfo(){
-      let userInfo=localStorage.getItem('userInfo')
-      if(userInfo){
-        userInfo=JSON.parse(userInfo)
-      }
-      this.userInfo=userInfo
     },
     handleCommand(command){
       console.log(command)
@@ -263,8 +264,9 @@ export default {
       service.logout().then(res=>{
         if(res.state==1){
           // 登出成功
-          localStorage.setItem('userInfo','')
+          utils.clearUserInfo()
           this.userInfo=""
+          window.location.reload()
         }
       }).catch(err=>{
       })

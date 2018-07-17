@@ -56,7 +56,8 @@
         categoryTabs: [],
         bookmarks:[],
         showEditSidebar:false,
-        selectItem:{}
+        selectItem:{},
+        isLogin:false
       };
     },
     components:{editSidebar},
@@ -64,16 +65,26 @@
       clickCount: Number
     },
     mounted() {
+      const userInfo=localStorage.getItem('userInfo')
+      if(userInfo){
+        this.isLogin=true
+      }
       //获取书签分类
       this.getBookmarkCategory()
       const $body = document.getElementsByClassName("main")[0]
       $body.addEventListener("click", () => {
         this.delBtnShow = false
       })
+
+
     },
     methods: {
       getBookmarkCategory() {
-        service.getBookmarkCategory().then(res => {
+        let apiService='getSysBookmarkCategory'
+        if(this.isLogin){
+          apiService='getUserBookmarkCategory'
+        }
+        service[apiService]().then(res => {
           const data=res.data
           data.forEach(value => {
             if (value.current) {
@@ -86,7 +97,11 @@
         })
       },
       getBookmarks(categoryId){
-        service.getBookmarks({categoryId:categoryId}).then(data=>{
+        let apiService='getSysBookmarks'
+        if(this.isLogin){
+          apiService='getUserBookmarks'
+        }
+        service.getSysBookmarks({categoryId:categoryId}).then(data=>{
           this.bookmarks = data.data
         })
       },
@@ -99,7 +114,6 @@
         console.log(item)
       },
       handleClick(tab, event) {
-        console.log(tab, event);
         this.getBookmarks(this.categoryTabs[tab.index].id)
       },
       rightClick(){
@@ -165,7 +179,7 @@
       text-align: left;
       li {
         display: inline-block;
-        width: calc(100% / 6);
+        width: calc(100% / 8);
         height: 143px;
         text-align: center;
         padding: 2%;

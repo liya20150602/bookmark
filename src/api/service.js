@@ -8,11 +8,17 @@ class service extends BaseModule{
   getRandomBgImg(data){
    return  this.get(api.getRandomBgImg,data)
   }
-  getBookmarkCategory(){
-    return this.get(api.getBookmarkCategory)
+  getSysBookmarkCategory(){
+    return this.get(api.getSysBookmarkCategory)
   }
-  getBookmarks(data){
-    return this.get(api.getBookmarks, data)
+  getUserBookmarkCategory(){
+    return this.get(api.getUserBookmarkCategory)
+  }
+  getSysBookmarks(data){
+    return this.get(api.getSysBookmarks, data)
+  }
+  getUserBookmarks(data){
+    return this.get(api.getUserBookmarks, data)
   }
   login(data){
     return this.post(api.login, data)
