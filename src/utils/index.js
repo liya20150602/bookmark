@@ -24,6 +24,12 @@ const util={
     var md5 = crypto.createHash("md5");
     md5.update(value);
     return md5.digest('hex');
+  },
+  isNul(value){
+    if(value==undefined || value==""){
+      return true
+    }
+    return false
   }
 }
 export default util

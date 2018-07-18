@@ -17,19 +17,10 @@ class BaseModule {
       },
       withCredentials: true // 允许携带cookie
     })
-    const whiteUrl=["account/register","login/in","bookmark/getSysBookmarks","bookmark/getSysBookmarkCategory","bgImg/getRandomBgImg"]
     this.$http.interceptors.request.use(config => {
-      whiteUrl.forEach(x=>{
-        x="apis/bookmark/"+x+"/"
-        if(config.url==x){
-          return config
+        if(!utils.isNul(utils.getUserInfo())){
+          config.headers.common['authToken'] =utils.getUserInfo().authToken
         }
-        if(utils.getUserInfo()!==''){
-          // config.headers.common['authToken'] =getUserInfo().authToken
-        }
-        return config
-      })
-
       return config
     }, error => {
       return Promise.reject(error)

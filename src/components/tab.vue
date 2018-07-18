@@ -11,7 +11,7 @@
           <li :key="item.id"
               v-for="(item,index) in bookmarks"
               :class="{'animated1':delBtnShow, 'shake':delBtnShow,'zoomOutDown':del}"
-              @mouseenter.stop="liMouseEnter(item)" @mouseleave.stop="liMouseLeaveOut(item)">
+              >
             <a @click="jumpUrlOrPanel(item)" class="tab-icon"  target="_blank" @contextmenu.prevent="rightClick">
               <div  v-if="item.bookmarkPhoto && !item.bookmarkColor"
                     class="tab-icon-img"
@@ -19,7 +19,7 @@
                     :style="{backgroundImage:'url('+item.bookmarkPhoto+')'}">
                 <div class="tab-icon-option" ></div>
                 <i v-show="delBtnShow" class="delete-btn el-icon-circle-close-outline" @click.stop="delUrl"></i>
-                <i v-show="item.editBtnShow" @click.stop="editUrl(item)" class="edit-btn el-icon-edit-outline"></i>
+                <i  @click.stop="editUrl(item)" class="edit-btn el-icon-edit-outline"></i>
               </div>
               <div v-if="!item.bookmarkPhoto && item.bookmarkColor"
                    class="tab-icon-default"
@@ -28,10 +28,10 @@
                 {{item.bookmarkTitle.substring(0,2)}}
                 <div class="tab-icon-option"   ></div>
                 <i v-show="delBtnShow" class="delete-btn el-icon-circle-close-outline" @click.stop="delUrl"></i>
-                <i v-show="item.editBtnShow" @click.stop="editUrl(item)" class="edit-btn el-icon-edit-outline"></i>
+                <i  @click.stop="editUrl(item)" class="edit-btn el-icon-edit-outline"></i>
               </div>
             </a>
-            <p>{{item.bookmarkTitle}}{{item.editBtnShow}}</p>
+            <p>{{item.bookmarkTitle}}</p>
           </li>
         </ul>
       </el-tab-pane>
@@ -51,7 +51,6 @@
       return {
         activeName: 'first',
         delBtnShow: false,
-        editBtnShow: false,
         del: false,
         categoryTabs: [],
         bookmarks:[],
@@ -111,7 +110,6 @@
         }else if(item.bookmarkType==1){
           // 显示右侧面板
         }
-        console.log(item)
       },
       handleClick(tab, event) {
         this.getBookmarks(this.categoryTabs[tab.index].id)
@@ -121,25 +119,10 @@
       },
       editUrl(item) {
         this.showEditSidebar=true
-        console.log("item",item)
         this.selectItem=item
-        console.log("eidt")
       },
       delUrl() {
         this.del = true
-        console.log('确认删除')
-      },
-      liMouseEnter(item) {
-        if (this.delBtnShow) {
-          item.editBtnShow = true
-          console.log("删除状态下，鼠标依",item)
-        }
-      },
-      liMouseLeaveOut(item) {
-        if (this.delBtnShow) {
-          item.editBtnShow = false
-          console.log("删除状态下，鼠标移出")
-        }
       },
       closeEditSidebar(item){
       this.showEditSidebar=false
@@ -225,27 +208,33 @@
               color: #666;
               transform: translate(-50%, -50%);
               z-index: 2;
+              display: none;
             }
           }
           .tab-icon-default{
            background-color: #eee;
             line-height: 110px;
           }
+            &:hover {
+            img {
+              box-shadow: 1px 1px 8px 2px rgba(70, 107, 208, 0.2);
+            }
+            .opacity{
+              .tab-icon-option{
+                border-radius: 10%;
+                background-color:rgba(255,255,255,0.7);
+              }
+              .edit-btn{
+                display: block;
+              }
+            }
 
+          }
         }
         p{
           margin-top:10px;
         }
-        a:hover {
-          img {
-            box-shadow: 1px 1px 8px 2px rgba(70, 107, 208, 0.2);
-          }
-          .opacity{
-            background-color:rgba(255,255,255,0.7);
-            border-radius: 10%;
-          }
 
-        }
       }
 
     }

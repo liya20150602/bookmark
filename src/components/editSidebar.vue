@@ -28,7 +28,7 @@
   </div>
 </template>
 <script>
-
+  import utils from '@/utils/'
 
   export default {
     name: 'sidebar',
@@ -37,6 +37,7 @@
       item:Object
     },
     data() {
+      console.log(this.item)
       return {
         buttonDisable: false,
         copyItem:Object.assign({},this.item)
@@ -45,13 +46,16 @@
     watch:{
       copyItem:{
         handler(curVal){
-          if( !this._.isUndefined(curVal.bookmarkUrl)&& curVal.bookmarkUrl!=''&& !this._.isUndefined(curVal.bookmarkTitle)&& curVal.bookmarkTitle!=''){
+          if( !utils.isNul(curVal.bookmarkUrl)&& !utils.isNul(curVal.bookmarkTitle)){
             this.buttonDisable=false
           }else {
             this.buttonDisable=true
           }
         },
         deep: true
+      },
+      item(val){
+        this.copyItem=Object.assign({},this.item)
       }
     },
     methods: {
