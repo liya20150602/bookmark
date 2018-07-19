@@ -4,9 +4,8 @@
       <top></top>
       <search></search>
       <tab ></tab>
-      <div id="randomChangeWallpaper" @click="getRandomBgImg">
-        <img id="fengche" i18n-title="randomWallpaper" src="./../assets/bg/fengche.png">
-        <div id="fengchegan"></div>
+      <div class="loading" @click="getRandomBgImg">
+        <p >切换<span :class="{'witchBg':witchClass}"> </span></p>
       </div>
     </div>
 
@@ -24,7 +23,8 @@
     data() {
       return {
         bgImgId: '',
-        zoom:1
+        zoom:1,
+        witchClass: false
       }
     },
     mounted() {
@@ -43,12 +43,18 @@
         if (this.bgImgId !== '') {
           param = {id: this.bgImgId}
         }
+        this.witchClass=true
         service.getRandomBgImg(param).then(res => {
-          console.log(res)
           this.bgImgId = res.data.id
-          const $body = document.getElementsByTagName("body")[0]
-          $body.style.background = "url('" + res.data.bgImgUrl + "') no-repeat 0 center"
-          $body.style.backgroundSize = "100%"
+            setTimeout(()=>{
+              console.log(res)
+              const $body = document.getElementsByTagName("body")[0]
+              $body.style.background = "url('" + res.data.bgImgUrl + "') no-repeat 0 center"
+              $body.style.backgroundSize = "100%"
+              this.witchClass=false
+              console.log(res.data.bgImgUrl )
+            },900)
+
         }).catch(err => {
           console.log(err)
         })
@@ -57,24 +63,61 @@
   }
 </script>
 <style lang="scss" scoped>
-  #fengche {
+  .loading{
     position: absolute;
     z-index: 3;
-    bottom: 20px;
-    right: 0;
+    bottom: 50px;
+    right: 50px;
     width: 40px;
     cursor: pointer;
     transition: all 3s linear;
+    p{
+      position:absolute;
+      left:0;
+      right:0;
+      top:0;
+      bottom:0;
+      margin:auto;
+      height:50px;
+      width:50px;
+      text-align: center;
+      line-height:50px;
+      font-size: 14px;
+      color:#f1d32f;
+      -webkit-animation: fontSize 3s linear infinite;
+      span{
+        position:absolute;
+        display:block;
+        height:50px;
+        width:50px;
+        border-radius:50%;
+        -webkit-box-shadow:0 3px 8px rgba(12,143,234,0.9);
+        box-shadow:0 3px 8px rgba(12,143,234,0.9);
+        left:0;
+        top:0;
+      }
+    }
   }
-
-  #fengchegan {
-    position: absolute;
-    z-index: 2;
-    bottom: 0;
-    right: 17px;
-    width: 5px;
-    height: 30px;
-    transition: all .6s linear;
-    background-color: red;
+  @-webkit-keyframes loading {
+    to {
+      -webkit-transform: rotate(0)
+    }
+    from {
+      -webkit-transform: rotate(-360deg)
+    }
+  }
+  @-webkit-keyframes fontSize {
+    0% {
+      font-size: 14px;
+    }
+    50% {
+      font-size: 18px;
+    }
+    100%{
+      font-size: 14px;
+    }
+  }
+  .witchBg{
+    -webkit-animation: loading .3s linear infinite;
   }
 </style>
