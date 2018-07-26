@@ -45,18 +45,19 @@
         }
         this.witchClass=true
         service.getRandomBgImg(param).then(res => {
-          this.bgImgId = res.data.id
+          this.bgImgId = res.id
             setTimeout(()=>{
               console.log(res)
               const $body = document.getElementsByTagName("body")[0]
-              $body.style.background = "url('" + res.data.bgImgUrl + "') no-repeat 0 center"
+              $body.style.background = "url('" + res.bgImgUrl + "') no-repeat 0 center"
               $body.style.backgroundSize = "100%"
               this.witchClass=false
-              console.log(res.data.bgImgUrl )
+              console.log(res.bgImgUrl )
             },900)
 
         }).catch(err => {
           console.log(err)
+          this.witchClass=false
         })
       }
     }

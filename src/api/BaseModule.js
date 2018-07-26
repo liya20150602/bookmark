@@ -18,8 +18,8 @@ class BaseModule {
       withCredentials: true // 允许携带cookie
     })
     this.$http.interceptors.request.use(config => {
-        if(!utils.isNul(utils.getUserInfo())){
-          config.headers.common['authToken'] =utils.getUserInfo().authToken
+        if(utils.getToken()){
+          config.headers.common['authToken'] = utils.getToken()
         }
       return config
     }, error => {
@@ -31,15 +31,16 @@ class BaseModule {
       if(response.status==200){
           if(response.data.state==0){
             //token失效 清除token
-            utils.clearuserInfo()
-            window.load()
-            }else {
-            return Promise.resolve(response.data)
+            // utils.clearUserInfo()
+            return Promise.reject()
+            }else if(response.data.state==1){
+            return Promise.resolve(response.data.data)
+          }else {
+            return Promise.reject(response.data)
           }
       }else {
-        return Promise.reject()
+        return Promise.reject(response)
       }
-      return response
     }, error => {
       Message.error('400');
       return Promise.reject(error.response)

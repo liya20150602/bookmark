@@ -7,6 +7,9 @@
       <div class="systemTime">
         {{time}}
       </div>
+      <div class="show" @click=" showAddSidebar=true">
+        <div>添加</div>
+      </div>
       <div class="login" v-if="!userInfo">
         <a  @click="dialogFormVisible = true">登录</a>
         <a  @click="regFormVisible = true">注册</a>
@@ -14,7 +17,7 @@
       <div class="personal" v-else>
         <el-dropdown trigger="click"@command="handleCommand">
           <span class="el-dropdown-link">
-            {{userInfo.loginName}}<i class="el-icon-arrow-down el-icon--right"></i>
+            {{userInfo}}<i class="el-icon-arrow-down el-icon--right"></i>
           </span>
           <el-dropdown-menu slot="dropdown"  >
             <el-dropdown-item command="logout">退出</el-dropdown-item>
@@ -55,16 +58,18 @@
         </el-form>
       </el-dialog>
     </div>
+    <sidebar :show="showAddSidebar" @close=" showAddSidebar=false"></sidebar>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
   import service from '@/api/service'
   import utils from '@/utils/'
-
-
+  import sidebar from '@/components/sidebar'
+  import { mapState } from 'vuex'
 export default {
   name: 'top',
+  components:{sidebar},
   data(){
 
     var validateUserName = (rule, value, callback) => {
@@ -127,13 +132,18 @@ export default {
       formLabelWidth: '80px',
       loginErr:'',
       regErr:'',
-      userInfo:''
+      showAddSidebar:false
     }
   },
+  computed:mapState({
+    userInfo:state => state.userName,
+    token:state => state.token
+  }),
   mounted(){
+    console.log(this.userInfo)
     this.initWeather()
     this.formatTime()
-    this.userInfo=utils.getUserInfo()
+
   },
   watch:{
     'loginForm.userName':function (val) {
@@ -183,17 +193,8 @@ export default {
       }
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          service.login(para).then(res=>{
-            if(res.state==1){
-              // 登录成功
-              const userInfo=JSON.stringify(Object.assign(res.data))
-              utils.setUserInfo(userInfo)
-              this.userInfo=userInfo
-              this.dialogFormVisible=false
-              window.location.reload()
-            }else {
-              this.loginErr=res.msg
-            }
+          this.$store.dispatch('loginActions',para).then(res=>{
+            this.dialogFormVisible=false
           }).catch(err=>{
             this.loginErr=err.msg
           })
@@ -205,24 +206,25 @@ export default {
     },
     checkUserName(callback){
       service.checkLoginName({loginName:this.regForm.userName}).then(data=>{
-        if(data.state==2){
+        callback()
+      }).catch(err=>{
+        if(err.state==2){
           callback(new Error("用户名已经存在"))
         }else {
-          callback()
+          callback(new Error("接口错误请稍后重试"))
         }
-      }).catch(err=>{
-        callback(new Error("接口错误请稍后重试"))
+
       })
     },
     checkEmail(callback){
       service.checkEmail({email:this.regForm.email}).then(data=>{
+        callback()
+      }).catch(err=>{
         if(data.state==2){
           callback(new Error("邮箱已经存在"))
         }else {
-          callback()
+          callback(new Error("接口错误请稍后重试"))
         }
-      }).catch(err=>{
-        callback(new Error("接口错误请稍后重试"))
       })
     },
     register(formName){
@@ -233,18 +235,8 @@ export default {
       }
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          service.register(para).then(data=>{
-            console.log(data,data.state==1,JSON.stringify(data.data))
-            if(data.state==1){
-              //注册成功
-              const userInfo=JSON.stringify(Object.assign(data.data,{"loginName":this.regForm.userName}))
-              utils.setUserInfo(userInfo)
-              this.userInfo=userInfo
-              this.regFormVisible=false
-            }else {
-              //注册失败
-            }
-
+          this.$store.dispatch("registerAction",para).then(data=>{
+            this.regFormVisible=false
           }).catch(err=>{
 
           })
@@ -261,15 +253,11 @@ export default {
       }
     },
     logout(){
-      service.logout().then(res=>{
-        if(res.state==1){
-          // 登出成功
-          utils.clearUserInfo()
-          this.userInfo=""
-          window.location.reload()
-        }
-      }).catch(err=>{
-      })
+      this.$store.dispatch("logoutAction")
+    },
+    showSidebar(){
+      console.log("显示右侧导航")
+      this.showAddSidebar=true
     }
   }
 }
@@ -300,6 +288,7 @@ export default {
         width:70%;
         line-height: 40px;
       }
+      .show,
       .login,
       .personal{
         float: right;
@@ -317,6 +306,12 @@ export default {
         }
         .el-dropdown{
           color: #fff;
+        }
+      }
+      .show{
+        div{
+          cursor: pointer;
+          text-align: center;
         }
       }
     }

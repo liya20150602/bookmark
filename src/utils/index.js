@@ -1,32 +1,28 @@
 import loadash from 'Lodash'
 import crypto from 'crypto'
 
-const util={
-  setUserInfo(value){
-    localStorage.setItem("userInfo",value)
+const token = "token"
+const userName = "userName"
+const util = {
+  setToken(value) {
+    localStorage.setItem(token, value)
   },
-  getUserInfo(){
-    const user=localStorage.getItem("userInfo")
-    if(user===''|| loadash.isUndefined(user)){
-      return ''
-    }else {
-      try {
-        return JSON.parse(user)
-      }catch (e) {
-        return ''
-      }
-    }
+  getToken() {
+    return localStorage.getItem(token)
   },
-  clearUserInfo(){
-    localStorage.removeItem("userInfo")
+  setUserName(value){
+    localStorage.setItem(userName,value)
   },
-  md5Pwd(value){
+  getUserName(){
+    return localStorage.getItem(userName)
+  },
+  md5Pwd(value) {
     var md5 = crypto.createHash("md5");
     md5.update(value);
     return md5.digest('hex');
   },
-  isNul(value){
-    if(value==undefined || value==""){
+  isNul(value) {
+    if (value == undefined || value == "") {
       return true
     }
     return false

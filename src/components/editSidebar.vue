@@ -79,6 +79,7 @@
     background: #fff;
     color:#000;
     padding:10px;
+    z-index:1000;
     .close{
       text-align: right;
       cursor: pointer;
